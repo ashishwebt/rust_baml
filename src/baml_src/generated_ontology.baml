@@ -1,5 +1,7 @@
 class Result {
-  summary string
+  status bool @description(#"
+    Extraction status
+  "#)
   @@dynamic  // Dynamic nodes and edges will be injected here
 }
 

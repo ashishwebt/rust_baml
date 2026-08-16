@@ -16,7 +16,7 @@ use super::*;
 #[baml(dynamic)]
 #[serde(crate = "::baml::__internal::serde")]
 pub struct Result {
-    pub summary: String,
+    pub status: bool,
     /// Dynamic fields added at runtime via TypeBuilder.
     #[baml(dynamic_fields)]
     #[serde(flatten)]
@@ -62,7 +62,7 @@ impl ::std::default::Default for Result {
     fn default() -> Self {
         Self {
 
-            summary: ::std::default::Default::default(),
+            status: ::std::default::Default::default(),
             __dynamic: ::std::collections::HashMap::new(),
         }
     }

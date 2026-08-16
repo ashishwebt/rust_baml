@@ -47,10 +47,10 @@ impl ResultClassBuilder {
     // =========================================================================
 
 
-    /// Access the `summary` field builder.
-    pub fn property_summary(&self) -> ::baml::ClassPropertyBuilder {
-        self.inner.get_property("summary")
-            .expect("Result.summary is statically defined in .baml and should always be present")
+    /// Access the `status` field builder.
+    pub fn property_status(&self) -> ::baml::ClassPropertyBuilder {
+        self.inner.get_property("status")
+            .expect("Result.status is statically defined in .baml and should always be present")
     }
 
 }

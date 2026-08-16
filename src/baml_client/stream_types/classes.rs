@@ -25,7 +25,7 @@ pub struct Result {
 
 
 
-    pub summary: Option<String>,
+    pub status: Option<bool>,
 
 
     /// Dynamic fields added at runtime via TypeBuilder.
@@ -74,7 +74,7 @@ impl ::std::default::Default for Result {
     fn default() -> Self {
         Self {
 
-            summary: ::std::default::Default::default(),
+            status: ::std::default::Default::default(),
 
             __dynamic: ::std::collections::HashMap::new(),
         }

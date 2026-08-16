@@ -1,10 +1,14 @@
 mod baml_client;
-mod baml_converter;
+mod extraction;
+mod ontology;
+mod persistence;
 
-use baml_converter::BamlConverter;
+use ontology::BamlConverter;
 use baml_client::type_builder::TypeBuilder;
 use baml_client::sync_client::B;
 use std::fs;
+use extraction::{Extractor, JsonFileExtractor};
+use persistence::{CypherAdapter, PersistenceAdapter};
 
 fn main() {
     dotenvy::from_filename(".env").ok();
@@ -19,6 +23,8 @@ fn main() {
     let generated = converter.generate();
     let schema_layer = converter.generate_cypher_creation_layer();
     let cypher_path = "cypher_creation.cypher";
+    let root_baml_path: &str = "dynamic_ontology.baml";
+    fs::write(root_baml_path, &generated).expect("failed to write root generated BAML review file");
     tb.add_baml(&generated).unwrap();
 
     let sample_text = "John Doe is a Senior Software Engineer at Acme Corporation, a healthcare company. \
@@ -35,7 +41,12 @@ fn main() {
     fs::write(extracted_json_path, &extracted_json_text).expect("failed to write extracted JSON to file");
 
     let data_layer = converter.generate_cypher_from_extracted(&extracted_json);
-    let cypher_output = format!("{schema_layer}\n\n// Extracted data\n{data_layer}");
+    // New: use extraction + persistence adapter
+    let extractor = JsonFileExtractor;
+    let schemas = extractor.extract(std::path::Path::new("ontology.json")).expect("failed to extract schemas");
+    let adapter = CypherAdapter;
+    let new_data_layer = adapter.generate_queries(&schemas, &extracted_json);
+    let cypher_output = format!("{schema_layer}\n\n// Extracted data (old generator)\n{data_layer}\n\n// Extracted data (adapter)\n{new_data_layer}");
     fs::write(cypher_path, &cypher_output).expect("failed to write cypher output to file");
 
     println!("Saved extracted JSON to {extracted_json_path}");
