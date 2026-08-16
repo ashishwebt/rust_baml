@@ -1,4 +1,5 @@
 use serde_json::{Map, Value};
+use uuid::Uuid;
 
 #[derive(Debug, Default, Clone)]
 pub struct OntologyNormalizer;
@@ -8,17 +9,6 @@ impl OntologyNormalizer {
         Self
     }
 
-    fn slugify(value: &str) -> String {
-        let mut slug = String::new();
-        for ch in value.to_ascii_lowercase().chars() {
-            if ch.is_ascii_alphanumeric() {
-                slug.push(ch);
-            } else if !slug.is_empty() && !slug.ends_with('-') {
-                slug.push('-');
-            }
-        }
-        slug.trim_matches('-').to_string()
-    }
 
     fn canonical_entity_name(raw: &str) -> &str {
         match raw.to_ascii_lowercase().as_str() {
@@ -29,14 +19,13 @@ impl OntologyNormalizer {
         }
     }
 
-    fn normalize_record(entity_name: &str, record: &Value) -> Value {
+    fn normalize_record(_entity_name: &str, record: &Value) -> Value {
         let mut obj = record.clone();
         if let Value::Object(map) = &mut obj {
             if !map.contains_key("source_id") {
-                if let Some(name) = map.get("name").and_then(Value::as_str) {
-                    let id = format!("{}:{}", entity_name.to_ascii_lowercase(), Self::slugify(name));
-                    map.insert("source_id".to_string(), Value::String(id));
-                }
+                // generate a UUID v4 for source_id to ensure uniqueness across systems
+                let id = Uuid::new_v4().to_string();
+                map.insert("source_id".to_string(), Value::String(id));
             }
 
             if let Some(ids) = map.get("parent_source_ids") {
