@@ -1,3 +1,7 @@
+//! Converts the canonical JSON ontology into a BAML adapter file.
+//!
+//! This is not the ontology itself. The real source-of-truth is `ontology.json`.
+//! The BAML output is a generated AI-facing schema used by the extraction layer.
 use serde_json::{Map, Value};
 use std::error::Error;
 use std::fs;
