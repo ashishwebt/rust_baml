@@ -16,11 +16,9 @@ fn main() {
     let converter = JsonOntologyAdapter::from_file("ontology.json")
         .expect("failed to read ontology.json");
 
-    let baml_adapter = converter.generate();
     let schema_layer = converter.generate_cypher_creation_layer();
     let cypher_path = "cypher_creation.cypher";
-    let generated_baml_path: &str = "dynamic_ontology.baml";
-    fs::write(generated_baml_path, &baml_adapter).expect("failed to write generated BAML adapter file");
+    
 
     let sample_text = "John Doe is a Senior Software Engineer at Acme Corporation, a healthcare company. \
         He has skills in Python, Machine Learning,  and Rust. \
@@ -34,7 +32,7 @@ fn main() {
     let extracted_json_text = serde_json::to_string_pretty(&extracted_json).expect("failed to pretty-print extracted JSON");
     fs::write(extracted_json_path, &extracted_json_text).expect("failed to write extracted JSON to file");
 
-    let data_layer = converter.generate_cypher_from_extracted(&extracted_json);
+    // legacy: old data_layer generator removed
 
     // Ontology normalization step: turn raw AI output into canonical ontology JSON
     // before handing it to persistence.
@@ -48,7 +46,7 @@ fn main() {
     let schemas = extractor.extract(std::path::Path::new("ontology.json")).expect("failed to extract schemas");
     let adapter = CypherAdapter;
     let new_data_layer = adapter.generate_queries(&schemas, &canonical_ontology);
-    let cypher_output = format!("{schema_layer}\n\n// Extracted data (old generator)\n{data_layer}\n\n// Canonical ontology JSON\n{canonical_text}\n\n// Persistence adapter\n{new_data_layer}");
+    let cypher_output = format!("{schema_layer}\n\n// Canonical ontology JSON\n{canonical_text}\n\n// Persistence adapter\n{new_data_layer}");
     fs::write(cypher_path, &cypher_output).expect("failed to write cypher output to file");
 
     println!("Saved extracted JSON to {extracted_json_path}");
