@@ -3,9 +3,9 @@ mod extraction;
 mod ontology;
 mod persistence;
 
-use ontology::{JsonOntologyAdapter, OntologyNormalizer};
+use ontology::{OntologyNormalizer};
 use std::fs;
-use extraction::{Extractor, JsonFileExtractor, extract_from_ontology};
+use extraction::{Extractor, JsonFileExtractor, JsonOntologyAdapter,extract_from_ontology};
 use persistence::{CypherAdapter, PersistenceAdapter};
 
 fn main() {
