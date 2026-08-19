@@ -53,4 +53,3 @@ impl Extractor for JsonFileExtractor {
 pub mod baml_runner;
 pub use baml_runner::extract_from_ontology;
 pub mod baml_converter;
-pub use baml_converter::BamlConverter as JsonOntologyAdapter;
