@@ -1,7 +1,5 @@
-//! Source-of-truth ontology layer.
-//!
-//! `ontology.json` is the canonical schema definition for the domain.
-//! The generated BAML file is a derived adapter for the AI extraction layer,
-//! not the primary ontology definition.
+pub mod model;
 pub mod normalizer;
+
+pub use model::{Entity, Ontology, OntologyError, PropertySpec, Relationship};
 pub use normalizer::OntologyNormalizer;

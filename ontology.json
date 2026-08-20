@@ -3,25 +3,43 @@
     "Person": {
       "description": "A person",
       "properties": {
-        "name": {"type": "string", "description": "Full name"},
-        "email": {"type": "string", "description": "Email address"}
+        "name": {
+          "type": "string",
+          "description": "Full name"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address"
+        }
       }
     },
     "Company": {
       "description": "A company",
       "properties": {
-        "name": {"type": "string", "description": "Company name"}
+        "name": {
+          "type": "string",
+          "description": "Company name"
+        }
       }
     },
     "Skill": {
       "description": "A skill",
       "properties": {
-        "name": {"type": "string", "description": "Skill name"}
+        "name": {
+          "type": "string",
+          "description": "Skill name"
+        }
       }
     }
   },
   "relationships": {
-    "worksAt": {"from": "Person", "to": "Company"},
-    "hasSkills": {"from": "Person", "to": "Skill"}
+    "worksAt": {
+      "from": "Person",
+      "to": "Company"
+    },
+    "hasSkill": {
+      "from": "Person",
+      "to": "Skill"
+    }
   }
 }
