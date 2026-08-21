@@ -1,4 +1,8 @@
-use rust_baml::{extraction::{BamlExtractor, Extractor}, ontology::Ontology, persistence::{CypherAdapter, PersistenceAdapter}};
+use rust_baml::{
+    extraction::{BamlExtractor, Extractor},
+    ontology::{Ontology, OntologyNormalizer},
+    persistence::{CypherAdapter, PersistenceAdapter},
+};
 use std::fs;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -21,12 +25,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     He has skills in Python, Machine Learning,  and Rust. \
     His email is john.doe@acme.com and phone is +1-555-123-4567. \
     He lives at 123 Main Street, Springfield, Illinois.";
-    let dy_extractor = extractor
+    let js_extraction = extractor
         .extract(sample_text)
-        .expect("failed to extract schemas");
+        .expect("failed to extract data");
+    let normalizer = OntologyNormalizer::new();
+    let normalized_json = normalizer.normalize(&js_extraction);
     let cyper_gen = CypherAdapter::new();
-    let query = cyper_gen.generate_queries(&dy_extractor);
+    let query = cyper_gen.generate_queries(&normalized_json);
     println!("{:?}", query);
+    println!("{:?}", normalized_json);
 
     Ok(())
 }
