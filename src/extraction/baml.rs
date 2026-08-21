@@ -20,9 +20,15 @@ impl<'a> BamlExtractor<'a> {
 
         output.push_str("dynamic class Result {\n");
 
-        for name in self.ontology.nodes.keys() {
-            output.push_str(&format!("  {} {}[]\n", Self::field_name(name), name));
+        for (name, entity) in &self.ontology.nodes {
+
+            let description = entity.description.as_ref()
+                            .map(|d| format!("@description(#\"{}\"#)", d))
+                            .unwrap_or_default();
+            output.push_str(&format!("  {} {}[] {} \n", Self::field_name(name), name, description ));
         }
+
+
 
         output.push_str("}\n");
         output
@@ -88,3 +94,4 @@ impl<'a> super::Extractor for BamlExtractor<'a> {
         Ok(v)
     }
 }
+
