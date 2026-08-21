@@ -1,6 +1,5 @@
-use rust_baml::{extraction::BamlExtractor, ontology::Ontology, persistence::CypherAdapter};
+use rust_baml::{extraction::{BamlExtractor, Extractor}, ontology::Ontology, persistence::{CypherAdapter, PersistenceAdapter}};
 use std::fs;
-
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenvy::dotenv().ok();
@@ -17,14 +16,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!();
     println!("{}", extractor.generate_schema());
 
-    let sample_text = "John Doe is a Senior Software Engineer at Acme Corporation, a healthcare company. \
+    let sample_text =
+        "John Doe is a Senior Software Engineer at Acme Corporation, a healthcare company. \
     He has skills in Python, Machine Learning,  and Rust. \
     His email is john.doe@acme.com and phone is +1-555-123-4567. \
     He lives at 123 Main Street, Springfield, Illinois.";
-    let dy_extractor = extractor.extract(sample_text).expect("failed to extract schemas");
+    let dy_extractor = extractor
+        .extract(sample_text)
+        .expect("failed to extract schemas");
     let cyper_gen = CypherAdapter::new();
-    let query = cyper_gen.generate(&dy_extractor);
-    println!("{:?}",query );
+    let query = cyper_gen.generate_queries(&dy_extractor);
+    println!("{:?}", query);
 
     Ok(())
 }

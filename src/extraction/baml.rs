@@ -1,10 +1,7 @@
-use crate::{ontology::{Entity, Ontology}};
+use crate::ontology::{Entity, Ontology};
 use serde_json::Value;
 use std::error::Error;
 
-/// The BAML extraction boundary owns both:
-/// ontology -> BAML schema generation
-/// BAML schema + text -> structured extraction
 pub struct BamlExtractor<'a> {
     ontology: &'a Ontology,
 }
@@ -24,39 +21,14 @@ impl<'a> BamlExtractor<'a> {
         output.push_str("dynamic class Result {\n");
 
         for name in self.ontology.nodes.keys() {
-            output.push_str(&format!(
-                "  {} {}[]\n",
-                Self::field_name(name),
-                name
-            ));
+            output.push_str(&format!("  {} {}[]\n", Self::field_name(name), name));
         }
 
         output.push_str("}\n");
         output
     }
-    
 
-    pub fn extract(&self, text: &str) -> Result<Value, Box<dyn Error>> {
-        let schema = self.generate_schema();
-
-        let tb = crate::baml_client::type_builder::TypeBuilder::new();
-        tb.add_baml(&schema)?;
-
-        // Call the generated sync client. Keep the dependency local to this module.
-        let res = crate::baml_client::sync_client::B
-            .ExtractInfo
-            .with_type_builder(&tb)
-            .call(text)?;
-
-        let v = serde_json::to_value(&res)?;
-        Ok(v)
-    }
-
-    fn generate_entity(
-        output: &mut String,
-        name: &str,
-        entity: &Entity,
-    ) {
+    fn generate_entity(output: &mut String, name: &str, entity: &Entity) {
         output.push_str(&format!("class {name} {{\n"));
 
         for (property_name, property) in &entity.properties {
@@ -65,11 +37,8 @@ impl<'a> BamlExtractor<'a> {
                 Self::map_type(&property.data_type)
             ));
 
-        if let Some(description) = &property.description {
-            output.push_str(&format!(
-                " @description(#\"{}\"#)",
-                description
-                ));
+            if let Some(description) = &property.description {
+                output.push_str(&format!(" @description(#\"{}\"#)", description));
             }
             output.push('\n');
         }
@@ -96,18 +65,26 @@ impl<'a> BamlExtractor<'a> {
         let mut chars = name.chars();
 
         match chars.next() {
-            Some(first) => {
-                first.to_lowercase().collect::<String>() + chars.as_str()
-            }
+            Some(first) => first.to_lowercase().collect::<String>() + chars.as_str(),
             None => String::new(),
         }
     }
 }
 
+impl<'a> super::Extractor for BamlExtractor<'a> {
+    
+    fn extract(&self, text: &str) -> Result<Value, Box<dyn Error>> {
+        let schema = self.generate_schema();
 
+        let tb = crate::baml_client::type_builder::TypeBuilder::new();
+        tb.add_baml(&schema)?;
 
-impl <'a> super::Extractor for BamlExtractor<'a> {
-    fn extract(&self, text: &str) -> Result<Value, Box<dyn Error>>{
-        self.extract(text)
+        let res = crate::baml_client::sync_client::B
+            .ExtractInfo
+            .with_type_builder(&tb)
+            .call(text)?;
+
+        let v = serde_json::to_value(&res)?;
+        Ok(v)
     }
 }

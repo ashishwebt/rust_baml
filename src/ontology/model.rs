@@ -38,7 +38,10 @@ pub enum OntologyError {
     InvalidEntityName(String),
 
     #[error("relationship '{relationship}' references unknown entity '{entity}'")]
-    UnknownEntity { relationship: String, entity: String },
+    UnknownEntity {
+        relationship: String,
+        entity: String,
+    },
 
     #[error("unsupported property type '{data_type}' for {entity}.{property}")]
     UnsupportedPropertyType {
@@ -64,8 +67,14 @@ impl Ontology {
             for (property_name, property) in &entity.properties {
                 if !matches!(
                     property.data_type.as_str(),
-                    "string" | "integer" | "float" | "boolean" |
-                    "string[]" | "integer[]" | "float[]" | "boolean[]"
+                    "string"
+                        | "integer"
+                        | "float"
+                        | "boolean"
+                        | "string[]"
+                        | "integer[]"
+                        | "float[]"
+                        | "boolean[]"
                 ) {
                     return Err(OntologyError::UnsupportedPropertyType {
                         entity: entity_name.clone(),
